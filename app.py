@@ -10,8 +10,8 @@ def get_ROIs(path,  delta_mz=0.005,  required_points=15,  dropped_points=3, prog
     scans = pd.DataFrame()
     for scan in run:
         if scan.ms_level == 1:
-            s = pd.Series(index=["index", "mz", "scantime"],
-                          data=[scan.i, scan.mz, scan.scan_time[0]])
+            s = pd.Series(index=["index", "mz", "scantime", "mz_mean"],
+                          data=[scan.i, scan.mz, scan.scan_time[0]], np.mean(scan.mz))
             s = pd.DataFrame(s).T
             scans = scans.append(pd.DataFrame(s))
     scans = scans.reset_index(drop=True)

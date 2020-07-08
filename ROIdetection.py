@@ -15,8 +15,7 @@ class Peak(object):
 class ROI(object):
     def __init__(self, peak):
         self.peak_list = []
-        self.peak_list.append(peak)
-        self.update_mean_mz()
+        self.add_peak_to_roi(peak)
 #Update m/z mean
     def update_mean_mz(self):
         total = 0
