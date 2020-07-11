@@ -16,7 +16,8 @@ def get_ROIs(scan):
 def main():
     rois = []
     dead_rois = []
-    threshold = 50
+    threshold = 3000
+    mzthreshold = 3000
     run = pymzml.run.Reader(
         "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML")
     for scan in list(run)[0:5]:
@@ -59,8 +60,8 @@ def main():
     completed_rois = []
     for saved_roi in dead_rois:
         peaklist = saved_roi.peak_list
-        pmin = np.array([peak.i for peak in peaklist]).min()
-        if pmin < threshold:
+        pmin = np.array([peak.mz for peak in peaklist]).min()
+        if pmin < mzthreshold:
             completed_rois.append(saved_roi)
 
     for roi in completed_rois:

@@ -9,7 +9,7 @@ class Peak(object):
         self.scan = scan
 
     def __str__(self):
-        return "({}, {})".format(self.mz, self.rt)
+        return "({}, {}, {})".format(self.mz, self.rt, self.i)
 
 #Perform operation on a single ROI
 class ROI(object):
