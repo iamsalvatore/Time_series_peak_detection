@@ -16,17 +16,11 @@ def get_ROIs(scan):
 def main():
     rois = []
     dead_rois = []
-    threshold = 2000
+    threshold = 50
     run = pymzml.run.Reader(
         "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML")
-    firstrun = True
-    #for scan in list(run)[0:10]:
-    for scan in run:
-        if firstrun == True:
-            print(scan.__dict__)
-            rois = get_ROIs(scan)
-            firstrun = False
-            continue
+    for scan in list(run)[0:5]:
+    # for scan in run:
         # mz can go into any ROI, but not mulitple roi
         extended_rois = []
         for idx, mz in enumerate(scan.mz):
@@ -60,6 +54,7 @@ def main():
                 rois = extended_rois
 
     dead_rois = dead_rois + extended_rois
+    print(extended_rois)
 
     completed_rois = []
     for saved_roi in dead_rois:
@@ -72,12 +67,10 @@ def main():
         print("ROI")
         for peak in roi.peak_list:
             print(peak)
-
     #     roi.save()
 
     # print(scan)
     # print(rois)
-
 
 # if __name__ == "__main__":
 main()
