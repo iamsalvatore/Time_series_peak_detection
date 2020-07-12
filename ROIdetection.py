@@ -32,26 +32,3 @@ class ROI(object):
 
     def get_end_rt(self):
         return self.peak_list[-1].rt
-
-    """ def processScans(self, path):
-        run = pymzml.run.Reader(path)
-        firstScan = run[0]
-        firstScanRois = self.get_ROIs(firstScan)
-        rois = []
-        for scan in run[1:]:
-            newRois = self.get_ROIs(scan)
-            for roi in newRois:
-                for firstroi in firstScanRois:
-                    rois.append(roi)
-
-        return rois
-
-    def get_ROIs(self, scan):
-        # read all scans in mzML file
-        rois = []
-        for peak in scan:
-            p = peak(peak.mz, peak.rt, peak.intensity)
-            roi = ROI(p)
-            self.peak_list.append(peak)
-
-        return rois """
