@@ -3,25 +3,14 @@ import ROIdetection
 import numpy as np
 
 
-def get_ROIs(scan):
-    # read all scans in mzML file
-    rois = []
-    for idx, mz in enumerate(scan.mz):
-        peak = ROIdetection.Peak(mz, scan.scan_time[0], scan.i[idx], scan)
-        roi = ROIdetection.ROI(peak)
-        rois.append(roi)
-    return rois
-
-
 def main():
     rois = []
     dead_rois = []
-    threshold = 3000
-    mzthreshold = 3000
+    threshold = 50000
     run = pymzml.run.Reader(
         "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML")
     for scan in list(run)[0:5]:
-    # for scan in run:
+        # for scan in run:
         # mz can go into any ROI, but not mulitple roi
         extended_rois = []
         for idx, mz in enumerate(scan.mz):
@@ -61,40 +50,14 @@ def main():
     for saved_roi in dead_rois:
         peaklist = saved_roi.peak_list
         pmin = np.array([peak.mz for peak in peaklist]).min()
-        if pmin < mzthreshold:
+        if pmin < threshold:
             completed_rois.append(saved_roi)
 
     for roi in completed_rois:
         print("ROI")
         for peak in roi.peak_list:
             print(peak)
-    #     roi.save()
 
-    # print(scan)
-    # print(rois)
 
 # if __name__ == "__main__":
 main()
-
-# rois = []
-# dead_rois = []
-# threshold = 0
-# for scan in scans:
-#     for mz in scan.mzs:
-#         # mz can go into any ROI, but not mulitple roi
-#         # multiple mz can go into one ROI (unlikely to happen very often)
-#         if rois == []:
-#             # here we create a new ROI
-#         else:
-#             roi_mzs = [roi.mean_mz for roi in rois]
-#             dist = abs(rois_mzs - mz)
-#             closest_dist = np.array(dist).min()
-#             if closest_dist < threshold:
-#                 # here we can add to an existing ROI
-#             else:
-#                 # here we create a new ROI
-#     # here we want check whether an ROI has been extended
-#     # if yes:
-#         # keep in rois
-#     # if no
-#         # remove from rois, add to dead_rois
