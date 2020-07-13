@@ -9,6 +9,12 @@ class Peak(object):
         self.scan = scan
         self.mean_mz = self.mz
 
+    def __lt__(self,other):
+        if self.mean_mz <= other.mean_mz:
+            return True
+        else:
+            return False
+
     def __str__(self):
         return "({}, {}, {})".format(self.mz, self.rt, self.i)
 
@@ -17,6 +23,9 @@ class ROI(object):
     def __init__(self, peak):
         self.peak_list = []
         self.add_peak_to_roi(peak)
+
+    def __str__(self):
+        return "({})".format(self.mean_mz)
 #Update m/z mean
     def update_mean_mz(self):
         total = 0
@@ -33,3 +42,9 @@ class ROI(object):
 
     def get_end_rt(self):
         return self.peak_list[-1].rt
+
+    def __lt__(self,other):
+        if self.mean_mz <= other.mean_mz:
+            return True
+        else:
+            return False
