@@ -7,6 +7,7 @@ class Peak(object):
         self.rt = rt
         self.i = i
         self.scan = scan
+        self.mean_mz = self.mz
 
     def __str__(self):
         return "({}, {}, {})".format(self.mz, self.rt, self.i)
