@@ -15,11 +15,12 @@ def test_sorting():
 def main():
     rois = []
     dead_rois = []
-    threshold = 10000000
+    threshold = 1000000
+    mzthreshold = 100000
     run = pymzml.run.Reader(
         "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML")
-    # for scan in list(run)[0:5]:
-    for scan in run:
+    for scan in list(run)[0:5]:
+    # for scan in run:
         # mz can go into any ROI, but not mulitple roi
         extended_rois = []
         for idx, mz in enumerate(scan.mz):
@@ -30,30 +31,31 @@ def main():
                     peak = ROIdetection.Peak(
                         mz, scan.scan_time[0], scan.i[idx], scan)
                     roi = ROIdetection.ROI(peak)
-                    extended_rois.append(roi)
+                    extended_rois.insert(roi)
                 # here we create a new ROI
                 else:
-                    rois.sort()
+                    # add a secon threshold
+                    # rois.sort()
                     # rois_mzs = [roi.mean_mz for roi in rois]
                     # dist = abs(rois_mzs - mz)
                     fake_mz = ROIdetection.Peak(mz, 0, 0, 0)
                     closest_roi_index = bisect.bisect_left(rois, fake_mz)-1
                     closest_dist = rois[closest_roi_index].mean_mz
-                    if closest_dist < threshold:
+                    if closest_dist < mzthreshold:
                         peak = ROIdetection.Peak(
                             mz, scan.scan_time[0], scan.i[idx], scan)
-                        rois[closest_roi_index].peak_list.append(peak)
-                        extended_rois.append(rois[closest_roi_index])
-                        rois.remove(rois[closest_roi_index])
+                        rois[closest_roi_index].add_peak_to_roi(peak)
+                        extended_rois.insert(rois[closest_roi_index])
+                        del rois[closest_roi_index]
                     # here we can add to an existing ROI
                     else:
                         peak = ROIdetection.Peak(
                             mz, scan.scan_time[0], scan.i[idx], scan)
                         roi = ROIdetection.ROI(peak)
-                        extended_rois.append(roi)
+                        extended_rois.insert(roi)
                 dead_rois = dead_rois + rois
                 rois = extended_rois
-
+        print(len(extended_rois))
     dead_rois = dead_rois + extended_rois
     print(extended_rois)
 
@@ -62,7 +64,7 @@ def main():
         peaklist = saved_roi.peak_list
         pmin = np.array([peak.mz for peak in peaklist]).min()
         if pmin < threshold:
-            completed_rois.append(saved_roi)
+            completed_rois.insert(saved_roi)
 
     for roi in completed_rois:
         print("ROI")
