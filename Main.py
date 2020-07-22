@@ -4,20 +4,21 @@ import numpy as np
 import bisect
 import time
 import CNN
-
+import roi as nn_roi
+import torch
 
 def test_sorting():
-    peaks = [ROIdetection.Peak(1, 2, 3, 4), ROIdetection.Peak(7, 2, 3, 4), ROIdetection.Peak(
-        4, 2, 3, 4), ROIdetection.ROI(ROIdetection.Peak(5, 2, 3, 4))]
+    peaks = [ROIdetection.Peak(1, 2, 3, 4), ROIdetection.Peak(7, 2, 3, 4),
+             ROIdetection.Peak(4, 2, 3, 4), ROIdetection.ROI(ROIdetection.Peak(5, 2, 3, 4))]
     peaks.sort()
     for peak in peaks:
         print(peak)
 
 
-def create_roi_for_list(scan, idx, rois):
+def create_roi_for_list(scan, idx, rois, scanidx):
     # creating peak object with mz, rt, intensity, scn
     peak = ROIdetection.Peak(
-        scan.mz[idx], scan.scan_time[0], scan.i[idx], scan)
+        scan.mz[idx], scan.scan_time[0], scan.i[idx], scanidx)
     # building a roi object with a peak we just constructed
     roi = ROIdetection.ROI(peak)
     # inserts roi into extended rois list
@@ -34,8 +35,11 @@ def main():
     run = pymzml.run.Reader(
         "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML")
     start = time.time()
+    for scanidx, scan in enumerate(run):
+        if scanidx == 15:
+            break
     # for scan in list(run)[0:5]:
-    for scan in run:
+        # for scan in run:
         # mz can go into any ROI, but not mulitple roi
         extended_rois = []
         print(len(extended_rois))
@@ -46,11 +50,12 @@ def main():
             else:
                 if rois == []:
                     extended_rois = create_roi_for_list(
-                        scan, idx, extended_rois)
+                        scan, idx, extended_rois, scanidx)
                 else:
-                    # make a peak to find the insertion point of a real mz for comparison of
+                    # make a peak to find the insertion point
+                    # of a real mz for comparison of
                     peak = ROIdetection.Peak(
-                        mz, scan.scan_time[0], scan.i[idx], scan)
+                        mz, scan.scan_time[0], scan.i[idx], scanidx)
                     # if len(rois) != 1:
                     if len(rois) == 1:
                         closest_roi_index = 0
@@ -81,7 +86,7 @@ def main():
                     # here we can add to an existing ROI
                     else:
                         extended_rois = create_roi_for_list(
-                            scan, idx, extended_rois)
+                            scan, idx, extended_rois, scanidx)
                 dead_rois = dead_rois + rois
                 rois = extended_rois
     dead_rois = dead_rois + extended_rois
@@ -105,8 +110,17 @@ def main():
 
     classifier = CNN.load_model()
     for roi in completed_rois:
-        roi = roi.ROI(roi.scan, )
-        CNN.classifier_prediction(roi, classifier, cpu, points=256)
+        roi = nn_roi.ROI(scan=[roi.peak_list[0], roi.peak_list[len(roi.peak_list)-1]],
+                         rt=[roi.peak_list[0].rt,
+                             roi.peak_list[len(roi.peak_list)-1].rt],
+                         i=[peak.i for peak in roi.peak_list],
+                         mz=[peak.mz for peak in roi.peak_list],
+                         mzmean=roi.mean_mz)
+        if len(roi.i)!=1:
+            CNN.classifier_prediction(roi, classifier, torch.device("cpu"), points=256)
+        else:
+            CNN.classifier_prediction(roi, classifier, torch.device("cpu"), points=False)
+
 
 
 # if __name__ == "__main__":

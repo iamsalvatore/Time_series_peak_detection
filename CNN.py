@@ -2,11 +2,20 @@ import torch
 import numpy as np
 from scipy.interpolate import interp1d
 
+
 def load_model():
-    # Model class must be defined somewhere
-    model = torch.load(
-        "/Users/salvatoreesposito/Downloads/peakonly-master/data/weights")
+    model = torch.load("/Users/salvatoreesposito/Downloads/peakonly-master/data/weights/RecurrentCNN.pt", map_location=torch.device('cpu'))
+    # model.load_state_dict(checkpoint['model_state_dict'])
+    # optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    # epoch = checkpoint['epoch']
+    # loss = checkpoint['loss']
+
     model.eval()
+    
+    
+    # # Model class must be defined somewhere
+    # model = torch.load(
+    #     "/Users/salvatoreesposito/Downloads/peakonly-master/data/weights/Classifier.pt", map_location=torch.device('cpu'))
     return model
 
 
@@ -18,6 +27,7 @@ def preprocess(signal, device, interpolate=False, length=None):
     :return: preprocessed intensities which can be used in CNN
     """
     if interpolate:
+        print(len(signal))
         interpolate = interp1d(np.arange(len(signal)), signal, kind='linear')
         signal = interpolate(np.arange(length) /
                              (length - 1) * (len(signal) - 1))
