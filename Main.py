@@ -23,7 +23,7 @@ def create_roi_for_list(scan, idx, rois, scanidx):
     # building a roi object with a peak we just constructed
     roi = ROIdetection.ROI(peak)
     # inserts roi into extended rois list
-    bisect.insort(rois, roi)
+    bisect.insort_right(rois, roi)
     # here we create a new ROI
     return rois
 
@@ -37,8 +37,8 @@ def main():
         "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML")
     start = time.time()
     for scanidx, scan in enumerate(run):
-        if scanidx == 100:
-            break
+        # if scanidx == 100:
+        #     break
     # for scan in list(run)[0:5]:
         # for scan in run:
         # mz can go into any ROI, but not mulitple roi
@@ -82,7 +82,7 @@ def main():
                         closest_roi = rois[closest_roi_index]
                         closest_roi.add_peak_to_roi(peak)
                         # inserting the closest roi into the extended rois list
-                        bisect.insort(extended_rois, closest_roi)
+                        bisect.insort_right(extended_rois, closest_roi)
                         del rois[closest_roi_index]
                     # here we can add to an existing ROI
                     else:
@@ -98,7 +98,7 @@ def main():
         peaklist = saved_roi.peak_list
         pmin = np.array([peak.mz for peak in peaklist]).min()
         if pmin < threshold:
-            bisect.insort(completed_rois, saved_roi)
+            bisect.insort_right(completed_rois, saved_roi)
 
     end = time.time()
     print(end - start)
