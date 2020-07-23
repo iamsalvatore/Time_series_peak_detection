@@ -6,7 +6,7 @@ import time
 import CNN
 import roi as nn_roi
 import torch
-import cnn_classifier
+
 
 def test_sorting():
     peaks = [ROIdetection.Peak(1, 2, 3, 4), ROIdetection.Peak(7, 2, 3, 4),
@@ -23,7 +23,7 @@ def create_roi_for_list(scan, idx, rois, scanidx):
     # building a roi object with a peak we just constructed
     roi = ROIdetection.ROI(peak)
     # inserts roi into extended rois list
-    bisect.insort_right(rois, roi)
+    bisect.insort(rois, roi)
     # here we create a new ROI
     return rois
 
@@ -31,19 +31,18 @@ def create_roi_for_list(scan, idx, rois, scanidx):
 def main():
     rois = []
     dead_rois = []
-    threshold = 1000000
+    threshold = 100000
     mzthreshold = 0.005
     run = pymzml.run.Reader(
         "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML")
     start = time.time()
     for scanidx, scan in enumerate(run):
-        # if scanidx == 100:
-        #     break
+        if scanidx == 10:
+            break
     # for scan in list(run)[0:5]:
         # for scan in run:
         # mz can go into any ROI, but not mulitple roi
         extended_rois = []
-        print(len(extended_rois))
         # loop over the mz values of a scan as well as the indexes
         for idx, mz in enumerate(scan.mz):
             if scan.i[idx] < threshold:
@@ -61,7 +60,7 @@ def main():
                     if len(rois) == 1:
                         closest_roi_index = 0
                     else:
-                        high_index = bisect.bisect_right(rois, peak)
+                        high_index = bisect.bisect_left(rois, peak)
                         low_index = high_index-1
                         if high_index == len(rois):
                             closest_roi_index = low_index
@@ -74,7 +73,7 @@ def main():
                                 closest_roi_index = high_index
                     # use the index to find the closest roi in the rois list
                     # and get the mean mz from it
-                    closest_dist = rois[closest_roi_index].mean_mz
+                    closest_dist = abs(rois[closest_roi_index].mean_mz - mz)
                     # check if the closest distance is less than the threshold
                     if closest_dist < mzthreshold:
                         # and use the index to find the roi in the rois list
@@ -82,7 +81,7 @@ def main():
                         closest_roi = rois[closest_roi_index]
                         closest_roi.add_peak_to_roi(peak)
                         # inserting the closest roi into the extended rois list
-                        bisect.insort_right(extended_rois, closest_roi)
+                        bisect.insort(extended_rois, closest_roi)
                         del rois[closest_roi_index]
                     # here we can add to an existing ROI
                     else:
@@ -91,23 +90,25 @@ def main():
                 dead_rois = dead_rois + rois
                 rois = extended_rois
     dead_rois = dead_rois + extended_rois
-    # print(extended_rois)
+    print(extended_rois)
 
+# Check and cleanup
     completed_rois = []
     for saved_roi in dead_rois:
         peaklist = saved_roi.peak_list
         pmin = np.array([peak.mz for peak in peaklist]).min()
-        if pmin < threshold:
-            bisect.insort_right(completed_rois, saved_roi)
+        if pmin < mzthreshold:
+            bisect.insort(completed_rois, saved_roi)
 
     end = time.time()
     print(end - start)
-
-    for roi in completed_rois:
-        print(roi)
-        # for peak in roi.peak_list:
-        #     print(peak)
     print(len(completed_rois))
+
+    # for roi in completed_rois:
+    #     print(roi)
+    #     # for peak in roi.peak_list:
+    #     #     print(peak)
+    # print(len(completed_rois))
 
     classifier = CNN.load_model()
     for roi in completed_rois:
@@ -117,11 +118,12 @@ def main():
                          i=[peak.i for peak in roi.peak_list],
                          mz=[peak.mz for peak in roi.peak_list],
                          mzmean=roi.mean_mz)
-        if len(roi.i)!=1:
-            CNN.classifier_prediction(roi, classifier, torch.device("cpu"), points=256)
+        if len(roi.i) != 1:
+            print("ROI intensity: " + str(roi.mzmean), "CNN classifier: " +
+                  str(CNN.classifier_prediction(roi, classifier, torch.device("cpu"), points=256)))
         else:
-            CNN.classifier_prediction(roi, classifier, torch.device("cpu"), points=False)
-
+            print("ROI intensity: " + str(roi.mzmean), "CNN classifier: " +
+                  str(CNN.classifier_prediction(roi, classifier, torch.device("cpu"), points=False)))
 
 
 # if __name__ == "__main__":
