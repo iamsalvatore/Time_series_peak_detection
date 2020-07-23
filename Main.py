@@ -6,6 +6,7 @@ import time
 import CNN
 import roi as nn_roi
 import torch
+import cnn_classifier
 
 def test_sorting():
     peaks = [ROIdetection.Peak(1, 2, 3, 4), ROIdetection.Peak(7, 2, 3, 4),
@@ -36,7 +37,7 @@ def main():
         "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML")
     start = time.time()
     for scanidx, scan in enumerate(run):
-        if scanidx == 15:
+        if scanidx == 100:
             break
     # for scan in list(run)[0:5]:
         # for scan in run:

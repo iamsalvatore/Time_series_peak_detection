@@ -1,11 +1,13 @@
 import torch
 import numpy as np
 from scipy.interpolate import interp1d
+import cnn_classifier
 
 
 def load_model():
-    model = torch.load("/Users/salvatoreesposito/Downloads/peakonly-master/data/weights/RecurrentCNN.pt", map_location=torch.device('cpu'))
-    # model.load_state_dict(checkpoint['model_state_dict'])
+    model = cnn_classifier.Classifier()
+    checkpoint = torch.load("/Users/salvatoreesposito/Downloads/peakonly-master/data/weights/Classifier.pt", map_location=torch.device('cpu'))
+    model.load_state_dict(checkpoint)
     # optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     # epoch = checkpoint['epoch']
     # loss = checkpoint['loss']
