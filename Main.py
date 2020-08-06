@@ -28,24 +28,30 @@ def create_roi_for_list(scan, idx, rois, scanidx):
     return rois
 
 
-def peakonly(num_of_scans=False, filepath=None):
+def peakonly(num_of_scans=False,filepath = None):
     rois = []
     dead_rois = []
     intensity_threshold = 10000
-    mzthreshold_min = 137.5
-    mzthreshold_max = 138.5
+    mzthreshold_min = 124
+    mzthreshold_max = 127
     delta_mz = 0.005
-    rt_min = 560
+    rt_min = 530
     rt_max = 600
     if filepath is None:
         filepath = "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML"
     run = pymzml.run.Reader(filepath)
     start = time.time()
+    # print("Hello")
     for scanidx, scan in enumerate(run):
         if num_of_scans != False and scanidx == num_of_scans:
             break
+        # print(scanidx)
         extended_rois = []
-        if scan.scan_time[0]*60. <= rt_max and scan.scan_time[0]*60. >= rt_min:
+        if 500 < scan.scan_time[0] < 600:
+            print(scan.scan_time[0])
+            print(scan.scan_time[0] <= rt_max, scan.scan_time[0] >= rt_min)
+        if scan.scan_time[0] <= rt_max and scan.scan_time[0] >= rt_min:
+            print("Hello")
             # mz can go into any ROI, but not mulitple roi
             # loop over the mz values of a scan as well as the indexes
             for idx, mz in enumerate(scan.mz):
@@ -77,8 +83,7 @@ def peakonly(num_of_scans=False, filepath=None):
                                     closest_roi_index = high_index
                         # use the index to find the closest roi in the rois list
                         # and get the mean mz from it
-                        closest_dist = abs(
-                            rois[closest_roi_index].mean_mz - mz)
+                        closest_dist = abs(rois[closest_roi_index].mean_mz - mz)
                         # check if the closest distance is less than the threshold
                         if closest_dist < delta_mz:
                             # and use the index to find the roi in the rois list
@@ -94,8 +99,8 @@ def peakonly(num_of_scans=False, filepath=None):
                                 scan, idx, extended_rois, scanidx)
         dead_rois = dead_rois + rois
         rois = extended_rois
-        print(len(rois), len(dead_rois), len(extended_rois))
-
+        print(len(rois),len(dead_rois),len(extended_rois))
+    
     dead_rois = dead_rois + extended_rois
     print(len(dead_rois))
     # print(extended_rois)
@@ -105,7 +110,7 @@ def peakonly(num_of_scans=False, filepath=None):
     for saved_roi in dead_rois:
         peaklist = saved_roi.peak_list
         pmin = np.array([peak.mz for peak in peaklist]).min()
-        # some rois have only 1 intesity
+        # some rois have only 1 intesity 
         if len(peaklist) > 1:
             # if pmin < delta_mz:
             bisect.insort(completed_rois, saved_roi)
@@ -113,6 +118,7 @@ def peakonly(num_of_scans=False, filepath=None):
     end = time.time()
     print(end - start)
     print(len(completed_rois))
+
     # for roi in completed_rois:
     #     print(roi)
     #     # for peak in roi.peak_list:
@@ -135,6 +141,6 @@ def peakonly(num_of_scans=False, filepath=None):
     #               str(CNN.classifier_prediction(roi, classifier, torch.device("cpu"), points=256)))
 
     return completed_rois
-peakonly()
+    
 # # if __name__ == "__main__":
 # peakonly(400)
