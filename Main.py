@@ -8,13 +8,6 @@ import roi as nn_roi
 import torch
 
 
-def test_sorting():
-    peaks = [ROIdetection.Peak(1, 2, 3, 4), ROIdetection.Peak(7, 2, 3, 4),
-             ROIdetection.Peak(4, 2, 3, 4), ROIdetection.ROI(ROIdetection.Peak(5, 2, 3, 4))]
-    peaks.sort()
-    for peak in peaks:
-        print(peak)
-
 
 def create_roi_for_list(scan, idx, rois, scanidx):
     # creating peak object with mz, rt, intensity, scn
@@ -32,11 +25,11 @@ def peakonly(num_of_scans=False,filepath = None):
     rois = []
     dead_rois = []
     intensity_threshold = 10000
-    mzthreshold_min = 124
-    mzthreshold_max = 127
+    mzthreshold_min = 116
+    mzthreshold_max = 117
     delta_mz = 0.005
-    rt_min = 530
-    rt_max = 600
+    rt_min = 690
+    rt_max = 880
     if filepath is None:
         filepath = "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML"
     run = pymzml.run.Reader(filepath)
@@ -51,7 +44,6 @@ def peakonly(num_of_scans=False,filepath = None):
             print(scan.scan_time[0])
             print(scan.scan_time[0] <= rt_max, scan.scan_time[0] >= rt_min)
         if scan.scan_time[0] <= rt_max and scan.scan_time[0] >= rt_min:
-            print("Hello")
             # mz can go into any ROI, but not mulitple roi
             # loop over the mz values of a scan as well as the indexes
             for idx, mz in enumerate(scan.mz):
@@ -119,28 +111,31 @@ def peakonly(num_of_scans=False,filepath = None):
     print(end - start)
     print(len(completed_rois))
 
-    # for roi in completed_rois:
-    #     print(roi)
-    #     # for peak in roi.peak_list:
-    #     #     print(peak)
-    # print(len(completed_rois))
-
-    # classifier = CNN.load_model()
-    # for roi in completed_rois:
-    #     roi = nn_roi.ROI(scan=[roi.peak_list[0], roi.peak_list[-1]],
-    #                      rt=[roi.peak_list[0].rt,
-    #                          roi.peak_list[-1].rt],
-    #                      i=[peak.i for peak in roi.peak_list],
-    #                      mz=[peak.mz for peak in roi.peak_list],
-    #                      mzmean=roi.mean_mz)
-    #     if len(roi.i) != 1:
-    #         print("ROI intensity: " + str(roi.mzmean), "CNN classifier: " +
-    #               str(CNN.classifier_prediction(roi, classifier, torch.device("cpu"), points=256)))
-    #     else:
-    #         print("ROI intensity: " + str(roi.mzmean), "CNN classifier: " +
-    #               str(CNN.classifier_prediction(roi, classifier, torch.device("cpu"), points=256)))
-
     return completed_rois
-    
-# # if __name__ == "__main__":
-# peakonly(400)
+
+
+def sub_rois (roi, num_seconds):
+    multiple_rois=[]
+    total_seconds=num_seconds
+    # split the rois while the max rt is still less than the total num of seconds
+    while total_seconds + roi.get_start_rt() < roi.get_end_rt():
+        # make an array of rt where the rt is less then the min rt plus the num of seconds
+        retention_times = [peak.rt for peak in roi.peak_list if peak.rt < roi.get_start_rt()+num_seconds]
+        # get the mzs correlated with the retention times
+        mz = [peak.mz for peak in roi.peak_list[:len(retention_times)]]
+        # get the intensities correlated with the retention times
+        intensity = [peak.i for peak in roi.peak_list[:len(retention_times)]]
+        scan_number = [peak.scan for peak in roi.peak_list[:len(retention_times)]]
+        mean_mz = np.mean(mz)
+        peaks = []
+        # list of peaks for the roi
+        for i in range(len(retention_times)):
+            peaks.append(ROIdetection.Peak(mz[i], retention_times[i], intensity[i], scan_number[i]))
+        new_roi = ROIdetection.ROI(peaks[0])
+        # adding peaks to the roi
+        for peak in peaks[1:]:
+            new_roi.add_peak_to_roi(peak)
+        multiple_rois.append(new_roi)
+        # increase num of seconds until over the maximum
+        total_seconds += num_seconds
+    return multiple_rois
