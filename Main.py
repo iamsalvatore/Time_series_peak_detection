@@ -10,6 +10,14 @@ import torch
 
 
 def create_roi_for_list(scan, idx, rois, scanidx):
+    """
+    This function firstly creates a peak object which has the
+    attributes of m/z,retention time, intensity, scan. Afterwards
+    a region of intrest (ROI) object is built with a peak. The ROI
+    is than inserted into the extended rois list and the method returns
+    rois.
+
+    """
     # creating peak object with mz, rt, intensity, scn
     peak = ROIdetection.Peak(
         scan.mz[idx], scan.scan_time[0], scan.i[idx], scanidx)
@@ -114,13 +122,15 @@ def peakonly(num_of_scans=False,filepath = None):
     return completed_rois
 
 
-def sub_rois (roi, num_seconds):
+def sub_rois (roi, percentage=10):
     multiple_rois=[]
+    length_difference =  roi.get_end_rt()-roi.get_start_rt()
+    num_seconds = length_difference*(percentage/100)
     total_seconds=num_seconds
     # split the rois while the max rt is still less than the total num of seconds
-    while total_seconds + roi.get_start_rt() < roi.get_end_rt():
+    for i in  range(int(100/percentage)+1):
         # make an array of rt where the rt is less then the min rt plus the num of seconds
-        retention_times = [peak.rt for peak in roi.peak_list if peak.rt < roi.get_start_rt()+num_seconds]
+        retention_times = [peak.rt for peak in roi.peak_list if peak.rt < roi.get_start_rt()+total_seconds]
         # get the mzs correlated with the retention times
         mz = [peak.mz for peak in roi.peak_list[:len(retention_times)]]
         # get the intensities correlated with the retention times
@@ -131,9 +141,11 @@ def sub_rois (roi, num_seconds):
         # list of peaks for the roi
         for i in range(len(retention_times)):
             peaks.append(ROIdetection.Peak(mz[i], retention_times[i], intensity[i], scan_number[i]))
-        new_roi = ROIdetection.ROI(peaks[0])
         # adding peaks to the roi
-        for peak in peaks[1:]:
+        new_roi = 0
+        for idx, peak in enumerate (peaks):
+            if idx == 0:
+                new_roi = ROIdetection.ROI(peak)
             new_roi.add_peak_to_roi(peak)
         multiple_rois.append(new_roi)
         # increase num of seconds until over the maximum
