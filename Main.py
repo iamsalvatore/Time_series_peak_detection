@@ -11,11 +11,7 @@ import torch
 
 def create_roi_for_list(scan, idx, rois, scanidx):
     """
-    This function firstly creates a peak object which has the
-    attributes of m/z,retention time, intensity, scan. Afterwards
-    a region of intrest (ROI) object is built with a peak. The ROI
-    is than inserted into the extended rois list and the method returns
-    rois.
+    Creates a peak objects and builds an ROI with a peak
 
     """
     # creating peak object with mz, rt, intensity, scn
@@ -34,7 +30,7 @@ def peakonly(num_of_scans=False,filepath = None):
     dead_rois = []
     intensity_threshold = 10000
     mzthreshold_min = 116
-    mzthreshold_max = 117
+    mzthreshold_max = 116.5
     delta_mz = 0.005
     rt_min = 690
     rt_max = 880
@@ -48,9 +44,9 @@ def peakonly(num_of_scans=False,filepath = None):
             break
         # print(scanidx)
         extended_rois = []
-        if 500 < scan.scan_time[0] < 600:
-            print(scan.scan_time[0])
-            print(scan.scan_time[0] <= rt_max, scan.scan_time[0] >= rt_min)
+        # if 500 < scan.scan_time[0] < 600:
+        #     print(scan.scan_time[0])
+        #     print(scan.scan_time[0] <= rt_max, scan.scan_time[0] >= rt_min)
         if scan.scan_time[0] <= rt_max and scan.scan_time[0] >= rt_min:
             # mz can go into any ROI, but not mulitple roi
             # loop over the mz values of a scan as well as the indexes
@@ -99,10 +95,10 @@ def peakonly(num_of_scans=False,filepath = None):
                                 scan, idx, extended_rois, scanidx)
         dead_rois = dead_rois + rois
         rois = extended_rois
-        print(len(rois),len(dead_rois),len(extended_rois))
+        # print(len(rois),len(dead_rois),len(extended_rois))
     
     dead_rois = dead_rois + extended_rois
-    print(len(dead_rois))
+    # print(len(dead_rois))
     # print(extended_rois)
 
 # Check and cleanup
@@ -116,8 +112,8 @@ def peakonly(num_of_scans=False,filepath = None):
             bisect.insort(completed_rois, saved_roi)
 
     end = time.time()
-    print(end - start)
-    print(len(completed_rois))
+    # print(end - start)
+    # print(len(completed_rois))
 
     return completed_rois
 
