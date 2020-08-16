@@ -28,12 +28,12 @@ def create_roi_for_list(scan, idx, rois, scanidx):
 def peakonly(num_of_scans=False,filepath = None):
     rois = []
     dead_rois = []
-    intensity_threshold = 10000
+    intensity_threshold = 1000
     mzthreshold_min = 116
-    mzthreshold_max = 116.5
+    mzthreshold_max = 116.3
     delta_mz = 0.005
-    rt_min = 690
-    rt_max = 880
+    rt_min = 440
+    rt_max = 550
     if filepath is None:
         filepath = "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML"
     run = pymzml.run.Reader(filepath)
