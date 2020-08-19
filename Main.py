@@ -34,6 +34,7 @@ def peakonly(num_of_scans=False,filepath = None):
     delta_mz = 0.005
     rt_min = 440
     rt_max = 550
+    # sys.maxsize
     if filepath is None:
         filepath = "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML"
     run = pymzml.run.Reader(filepath)
