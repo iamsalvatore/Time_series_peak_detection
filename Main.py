@@ -29,11 +29,11 @@ def peakonly(num_of_scans=False,filepath = None):
     rois = []
     dead_rois = []
     intensity_threshold = 1000
-    mzthreshold_min = 116
-    mzthreshold_max = 116.3
+    mzthreshold_min = 0
+    mzthreshold_max = sys.maxsize
     delta_mz = 0.005
-    rt_min = 440
-    rt_max = 550
+    rt_min = 0
+    rt_max = sys.maxsize
     # sys.maxsize
     if filepath is None:
         filepath = "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML"
