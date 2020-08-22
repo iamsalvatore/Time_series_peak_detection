@@ -32,17 +32,17 @@ class ROI(object):
         for peak in self.peak_list:
             total += peak.mz
         self.mean_mz = total / len(self.peak_list)
-
+# append peak to the roi list and update the mean
     def add_peak_to_roi(self, peak):
         self.peak_list.append(peak)
         self.update_mean_mz()
-
+    # get start of the retention time
     def get_start_rt(self):
         return self.peak_list[0].rt  # assumes peaks are always in rt order
-
+    # get end of the retention time
     def get_end_rt(self):
         return self.peak_list[-1].rt
-
+    # an ROI class is made comparable to another class such as peak, ROI using the lt function
     def __lt__(self,other):
         if self.mean_mz <= other.mean_mz:
             return True

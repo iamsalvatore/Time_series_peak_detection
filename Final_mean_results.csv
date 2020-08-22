@@ -1,3 +1,0 @@
-cnn_value_count classified_rois mean_mz mean_rt mean_max_intensity
-|90    264
-dtype: int64| 0.1 116.0706424725 492.33375 15254817.0

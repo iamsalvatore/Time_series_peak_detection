@@ -4,6 +4,7 @@ import numpy as np
 import bisect
 import time
 import CNN
+import sys
 import roi as nn_roi
 import torch
 
@@ -29,25 +30,20 @@ def peakonly(num_of_scans=False,filepath = None):
     rois = []
     dead_rois = []
     intensity_threshold = 1000
-    mzthreshold_min = 0
-    mzthreshold_max = sys.maxsize
+    mzthreshold_min = 90
+    mzthreshold_max = 150
     delta_mz = 0.005
-    rt_min = 0
-    rt_max = sys.maxsize
+    rt_min = 400
+    rt_max = 800
     # sys.maxsize
     if filepath is None:
         filepath = "/Users/salvatoreesposito/Downloads/Beer_multibeers_1_fullscan1.mzML"
     run = pymzml.run.Reader(filepath)
     start = time.time()
-    # print("Hello")
     for scanidx, scan in enumerate(run):
         if num_of_scans != False and scanidx == num_of_scans:
             break
-        # print(scanidx)
         extended_rois = []
-        # if 500 < scan.scan_time[0] < 600:
-        #     print(scan.scan_time[0])
-        #     print(scan.scan_time[0] <= rt_max, scan.scan_time[0] >= rt_min)
         if scan.scan_time[0] <= rt_max and scan.scan_time[0] >= rt_min:
             # mz can go into any ROI, but not mulitple roi
             # loop over the mz values of a scan as well as the indexes
@@ -96,11 +92,8 @@ def peakonly(num_of_scans=False,filepath = None):
                                 scan, idx, extended_rois, scanidx)
         dead_rois = dead_rois + rois
         rois = extended_rois
-        # print(len(rois),len(dead_rois),len(extended_rois))
     
     dead_rois = dead_rois + extended_rois
-    # print(len(dead_rois))
-    # print(extended_rois)
 
 # Check and cleanup
     completed_rois = []
@@ -113,9 +106,7 @@ def peakonly(num_of_scans=False,filepath = None):
             bisect.insort(completed_rois, saved_roi)
 
     end = time.time()
-    # print(end - start)
-    # print(len(completed_rois))
-
+  
     return completed_rois
 
 
