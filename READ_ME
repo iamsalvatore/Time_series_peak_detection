@@ -1,0 +1,3 @@
+-Developed an algorithm to calculate regions of interests (ROIs) (Cython, Python)
+-Built a CNN to identify peaks in ROIs (Pytorch)
+-Built an RNN to identify the pattern of the peaks in ROIs (Pytorch)
