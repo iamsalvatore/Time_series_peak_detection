@@ -3,7 +3,6 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-library_path = '/Users/salvatoreesposito/Desktop/peakonly'
 sys.path.append(library_path)
 from models.cnn_classifier import Classifier
 from models.cnn_segmentator import Segmentator
@@ -165,3 +164,4 @@ def append_results():
         meanwriter.writerow([pd.Series(cnn_percentage).value_counts(),str(num_classified_rois/num_rois),mean_mz,mean_rt, intensity])
 
     bar_data = pd.Series(cnn_percentage).value_counts()
+# library_path = '/Users/salvatoreesposito/Desktop/peakonly'

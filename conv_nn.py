@@ -3,7 +3,6 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-library_path = '/Users/salvatoreesposito/Desktop/peakonly'
 sys.path.append(library_path)
 from models.cnn_classifier import Classifier
 from models.cnn_segmentator import Segmentator
@@ -162,3 +161,5 @@ def append_results():
     with open('Final_mean_results.csv', 'w', newline='') as csvfile: 
         meanwriter = csv.writer(csvfile, delimiter=' ',quotechar='|',quoting=csv.QUOTE_MINIMAL)
         meanwriter.writerow(["cnn_value_count","classified_rois","mean_mz","mean_rt","mean_max_intensity"])
+
+# library_path = '/Users/salvatoreesposito/Desktop/peakonly'
