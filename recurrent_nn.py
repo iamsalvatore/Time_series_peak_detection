@@ -25,8 +25,8 @@ import pandas as pd
 import time
 import csv
 start = time.time()
-%load_ext autoreload
-%autoreload 2
+# %load_ext autoreload
+# %autoreload 2
 # checking if gpu is available
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 

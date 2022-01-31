@@ -25,8 +25,8 @@ import pandas as pd
 import time
 import csv
 start = time.time()
-%load_ext autoreload
-%autoreload 2
+# %load_ext autoreload
+# %autoreload 2
 # checking if gpu is available
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -162,6 +162,3 @@ def append_results():
     with open('Final_mean_results.csv', 'w', newline='') as csvfile: 
         meanwriter = csv.writer(csvfile, delimiter=' ',quotechar='|',quoting=csv.QUOTE_MINIMAL)
         meanwriter.writerow(["cnn_value_count","classified_rois","mean_mz","mean_rt","mean_max_intensity"])
-        meanwriter.writerow([pd.Series(cnn_percentage).value_counts(),str(num_classified_rois/num_rois),mean_mz,mean_rt, intensity])
-
-    bar_data = pd.Series(cnn_percentage).value_counts()

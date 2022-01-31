@@ -8,12 +8,9 @@ import sys
 import roi as nn_roi
 import torch
 
-
-
 def create_roi_for_list(scan, idx, rois, scanidx):
     """
     Creates a peak objects and builds an ROI with a peak
-
     """
     # creating peak object with mz, rt, intensity, scn
     peak = ROIdetection.Peak(
@@ -24,7 +21,6 @@ def create_roi_for_list(scan, idx, rois, scanidx):
     bisect.insort(rois, roi)
     # here we create a new ROI
     return rois
-
 
 def peakonly(num_of_scans=False,filepath = None):
     rois = []
