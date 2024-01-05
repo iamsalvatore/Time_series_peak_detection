@@ -1,0 +1,6 @@
+pymzml
+numpy
+torch
+# Add 'CNN' dependency here if available via pip or provide instructions on how to install it.
+# Add 'ROIdetection' dependency here if available via pip or provide instructions on how to install it.
+# Add 'roi' dependency here if available via pip or provide instructions on how to install it.
